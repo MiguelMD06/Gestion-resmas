@@ -19,6 +19,7 @@ import com.example.gestionresmas.database.ClientDao;
 import com.example.gestionresmas.database.SaleDao;
 import com.example.gestionresmas.models.Client;
 import com.example.gestionresmas.models.ClientDebtSummary;
+import com.example.gestionresmas.ui.UiUtils;
 import com.example.gestionresmas.ui.clients.ClientDetailActivity;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
@@ -59,7 +60,8 @@ public class DebtLedgerActivity extends AppCompatActivity implements DebtAdapter
         tvEmptyDebts = findViewById(R.id.tvEmptyDebts);
         rvDebtors = findViewById(R.id.rvDebtors);
 
-        rvDebtors.setLayoutManager(new LinearLayoutManager(this));
+        rvDebtors.setLayoutManager(UiUtils.createAdaptiveLayoutManager(this, 340));
+        UiUtils.setupEdgeToEdge(this, findViewById(R.id.rootDebtLedger), findViewById(R.id.appBarLayout), rvDebtors, null);
         adapter = new DebtAdapter(this);
         adapter.setListener(this);
         rvDebtors.setAdapter(adapter);
