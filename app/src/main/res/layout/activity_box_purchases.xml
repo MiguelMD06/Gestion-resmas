@@ -2,21 +2,22 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootBoxPurchases"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background"
-    android:fitsSystemWindows="true">
+    android:background="@color/background">
 
     <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/primary"
-        android:fitsSystemWindows="true">
+        android:background="@color/primary">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
+            app:layout_scrollFlags="scroll|enterAlways|snap"
             app:navigationIcon="@drawable/ic_arrow_back"
             app:navigationIconTint="@color/white"
             app:title="@string/box_purchases_title"
@@ -42,6 +43,8 @@
                 android:id="@+id/chipGroupFilters"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                app:selectionRequired="true"
+                app:singleLine="true"
                 app:singleSelection="true">
 
                 <com.google.android.material.chip.Chip
@@ -89,7 +92,8 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvBoxes"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:clipToPadding="false" />
 
     </LinearLayout>
 

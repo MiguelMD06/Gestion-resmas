@@ -12,13 +12,14 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.gestionresmas.R;
 import com.example.gestionresmas.database.BoxPurchaseDao;
 import com.example.gestionresmas.models.BoxPurchase;
+import com.example.gestionresmas.ui.UiUtils;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -60,9 +61,11 @@ public class BoxPurchasesActivity extends AppCompatActivity {
         chipGroupFilters = findViewById(R.id.chipGroupFilters);
         ExtendedFloatingActionButton fabAddBox = findViewById(R.id.fabAddBox);
 
-        rvBoxes.setLayoutManager(new LinearLayoutManager(this));
+        rvBoxes.setLayoutManager(UiUtils.createAdaptiveLayoutManager(this, 340));
         adapter = new BoxPurchaseAdapter(this);
         rvBoxes.setAdapter(adapter);
+
+        UiUtils.setupEdgeToEdge(this, findViewById(R.id.rootBoxPurchases), findViewById(R.id.appBarLayout), rvBoxes, fabAddBox);
 
         fabAddBox.setOnClickListener(v -> showAddBoxDialog());
 
@@ -70,7 +73,22 @@ public class BoxPurchasesActivity extends AppCompatActivity {
             applyFilters();
         });
 
+        if (savedInstanceState != null) {
+            int savedChipId = savedInstanceState.getInt("selected_filter_chip", View.NO_ID);
+            if (savedChipId != View.NO_ID) {
+                chipGroupFilters.check(savedChipId);
+            }
+        }
+
         loadBoxes();
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (chipGroupFilters != null) {
+            outState.putInt("selected_filter_chip", chipGroupFilters.getCheckedChipId());
+        }
     }
 
     @Override
