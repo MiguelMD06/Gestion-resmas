@@ -8,11 +8,10 @@
         <item name="colorSurface">@color/surface</item>
         <item name="colorOnSurface">@color/text_primary</item>
         <item name="colorOnSurfaceVariant">@color/text_secondary</item>
-        <!-- Status bar: fondo oscuro con iconos blancos -->
-        <item name="android:statusBarColor">@color/surface</item>
+        <!-- Status bar y Navigation bar transparentes para Edge-to-Edge -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">false</item>
-        <!-- Navigation bar: fondo oscuro con iconos blancos -->
-        <item name="android:navigationBarColor">@color/background</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowLightNavigationBar" tools:targetApi="27">false</item>
         <!-- Desactiva el forzado de contraste automático del sistema (API 29+) -->
         <item name="android:enforceStatusBarContrast" tools:targetApi="29">false</item>
