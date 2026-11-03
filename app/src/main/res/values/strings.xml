@@ -1,0 +1,65 @@
+<resources>
+    <string name="app_name">Gestión de Resmas</string>
+
+    <!-- Dashboard -->
+    <string name="dashboard_title">Gestión de Resmas</string>
+    <string name="dashboard_subtitle">Control de inventario, lotes y ventas</string>
+    <string name="stock_carta">Resmas Carta</string>
+    <string name="stock_oficio">Resmas Oficio</string>
+    <string name="inventory_valuation">Valor Inventario</string>
+    <string name="pending_debt">Cuentas por Cobrar</string>
+    <string name="recovered_capital">Capital Recuperado</string>
+    <string name="real_profit">Ganancia Real</string>
+    <string name="projected_profit">Ganancia Proyectada (Stock)</string>
+    <string name="quick_actions">Acciones Principales</string>
+    <string name="action_new_sale">Nueva Venta</string>
+    <string name="action_box_purchases">Compras / Lotes</string>
+    <string name="action_clients">Clientes</string>
+    <string name="action_debt_ledger">Libro de Deudas</string>
+    <string name="action_sales_history">Historial de Ventas</string>
+    <string name="recent_activity">Últimas Ventas</string>
+    <string name="no_sales_yet">No hay ventas registradas aún</string>
+
+    <!-- Compras / Lotes -->
+    <string name="box_purchases_title">Lotes de Cajas de Resmas</string>
+    <string name="add_box">Comprar Nueva Caja</string>
+    <string name="box_type">Tipo de Resma</string>
+    <string name="box_price">Precio de Compra de la Caja</string>
+    <string name="reams_quantity">Cantidad de Resmas en la Caja</string>
+    <string name="unit_cost">Costo Unitario por Resma</string>
+    <string name="purchase_date">Fecha de Compra</string>
+
+    <!-- Clientes -->
+    <string name="clients_title">Clientes y Márgenes</string>
+    <string name="add_client">Nuevo Cliente</string>
+    <string name="edit_client">Editar Cliente</string>
+    <string name="client_name">Nombre del Cliente</string>
+    <string name="client_phone">Teléfono de Contacto</string>
+    <string name="utility_margin">Margen de Utilidad (%)</string>
+    <string name="margin_hint">Ej: 5.0 para 5%</string>
+
+    <!-- Ventas -->
+    <string name="new_sale_title">Registrar Nueva Venta</string>
+    <string name="select_client">Seleccionar Cliente</string>
+    <string name="select_lot">Seleccionar Lote de Resmas</string>
+    <string name="quantity">Cantidad</string>
+    <string name="price_per_ream">Precio Unitario Calculado</string>
+    <string name="subtotal">Subtotal</string>
+    <string name="total_sale">Total a Pagar</string>
+    <string name="payment_status">Estado del Pago</string>
+    <string name="paid">PAGADO</string>
+    <string name="debt">DEBE</string>
+    <string name="add_item">Agregar Ítem a la Venta</string>
+    <string name="confirm_sale">Confirmar y Registrar Venta</string>
+
+    <!-- Deudas -->
+    <string name="debt_ledger_title">Libro de Cuentas por Cobrar</string>
+    <string name="total_debt_header">Deuda Total Pendiente</string>
+    <string name="mark_as_paid">Marcar como Pagado</string>
+
+    <!-- Generales -->
+    <string name="save">Guardar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="delete">Eliminar</string>
+    <string name="confirm">Confirmar</string>
+</resources>
