@@ -15,3 +15,13 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+planificacion/
+CLAUDE.md
+CLAUDE.local.md
+GEMINI.md
+.claude/
+.env
+.env.*
+!.env.example
+
