@@ -20,6 +20,7 @@ import com.example.gestionresmas.database.SaleDao;
 import com.example.gestionresmas.models.Payment;
 import com.example.gestionresmas.models.Sale;
 import com.example.gestionresmas.models.SaleDetail;
+import com.example.gestionresmas.ui.UiUtils;
 import com.example.gestionresmas.ui.boxes.BoxPurchasesActivity;
 import com.example.gestionresmas.ui.clients.ClientsActivity;
 import com.example.gestionresmas.ui.debt.DebtLedgerActivity;
@@ -68,6 +69,7 @@ public class MainActivity extends AppCompatActivity implements SalesAdapter.OnSa
         saleDao = new SaleDao(this);
 
         initViews();
+        UiUtils.setupEdgeToEdge(this, findViewById(R.id.main), findViewById(R.id.appBarLayout), findViewById(R.id.nestedScrollMain), null);
         setupNavigation();
     }
 
@@ -84,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements SalesAdapter.OnSa
         tvEmptySales = findViewById(R.id.tvEmptySales);
         rvRecentSales = findViewById(R.id.rvRecentSales);
 
-        rvRecentSales.setLayoutManager(new LinearLayoutManager(this));
+        rvRecentSales.setLayoutManager(UiUtils.createAdaptiveLayoutManager(this, 340));
         recentSalesAdapter = new SalesAdapter(this);
         recentSalesAdapter.setListener(this);
         rvRecentSales.setAdapter(recentSalesAdapter);
