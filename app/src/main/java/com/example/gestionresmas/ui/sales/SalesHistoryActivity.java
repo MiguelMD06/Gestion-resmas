@@ -10,8 +10,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.gestionresmas.R;
@@ -19,6 +19,7 @@ import com.example.gestionresmas.database.SaleDao;
 import com.example.gestionresmas.models.Payment;
 import com.example.gestionresmas.models.Sale;
 import com.example.gestionresmas.models.SaleDetail;
+import com.example.gestionresmas.ui.UiUtils;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.ChipGroup;
@@ -57,17 +58,34 @@ public class SalesHistoryActivity extends AppCompatActivity implements SalesAdap
         tvEmptySalesHistory = findViewById(R.id.tvEmptySalesHistory);
         chipGroupSalesFilter = findViewById(R.id.chipGroupSalesFilter);
 
-        rvSalesHistory.setLayoutManager(new LinearLayoutManager(this));
+        rvSalesHistory.setLayoutManager(UiUtils.createAdaptiveLayoutManager(this, 340));
         adapter = new SalesAdapter(this);
         adapter.setShowPayButton(true);
         adapter.setListener(this);
         rvSalesHistory.setAdapter(adapter);
 
+        UiUtils.setupEdgeToEdge(this, findViewById(R.id.rootSalesHistory), findViewById(R.id.appBarLayout), rvSalesHistory, null);
+
         chipGroupSalesFilter.setOnCheckedStateChangeListener((group, checkedIds) -> {
             applyFilters();
         });
 
+        if (savedInstanceState != null) {
+            int savedChipId = savedInstanceState.getInt("selected_sales_chip", View.NO_ID);
+            if (savedChipId != View.NO_ID) {
+                chipGroupSalesFilter.check(savedChipId);
+            }
+        }
+
         loadSales();
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (chipGroupSalesFilter != null) {
+            outState.putInt("selected_sales_chip", chipGroupSalesFilter.getCheckedChipId());
+        }
     }
 
     @Override
