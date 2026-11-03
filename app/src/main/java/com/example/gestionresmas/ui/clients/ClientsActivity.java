@@ -20,6 +20,7 @@ import com.example.gestionresmas.database.ClientDao;
 import com.example.gestionresmas.database.SaleDao;
 import com.example.gestionresmas.models.Client;
 import com.example.gestionresmas.models.Sale;
+import com.example.gestionresmas.ui.UiUtils;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
@@ -54,7 +55,8 @@ public class ClientsActivity extends AppCompatActivity implements ClientAdapter.
         etSearchClient = findViewById(R.id.etSearchClient);
         ExtendedFloatingActionButton fabAddClient = findViewById(R.id.fabAddClient);
 
-        rvClients.setLayoutManager(new LinearLayoutManager(this));
+        rvClients.setLayoutManager(UiUtils.createAdaptiveLayoutManager(this, 340));
+        UiUtils.setupEdgeToEdge(this, findViewById(R.id.rootClients), findViewById(R.id.appBarLayout), rvClients, fabAddClient);
         adapter = new ClientAdapter(this);
         adapter.setListener(this);
         rvClients.setAdapter(adapter);

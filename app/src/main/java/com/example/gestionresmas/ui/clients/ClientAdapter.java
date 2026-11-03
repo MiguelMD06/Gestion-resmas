@@ -83,12 +83,20 @@ public class ClientAdapter extends RecyclerView.Adapter<ClientAdapter.ClientView
             holder.tvClientDebtTag.setVisibility(View.GONE);
         }
 
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) listener.onViewHistory(client);
+        });
+
         holder.btnEditClient.setOnClickListener(v -> {
             if (listener != null) listener.onEdit(client);
         });
 
         holder.btnViewClientHistory.setOnClickListener(v -> {
             if (listener != null) listener.onViewHistory(client);
+        });
+
+        holder.btnDeleteClient.setOnClickListener(v -> {
+            if (listener != null) listener.onDelete(client);
         });
 
         holder.itemView.setOnLongClickListener(v -> {
@@ -104,7 +112,7 @@ public class ClientAdapter extends RecyclerView.Adapter<ClientAdapter.ClientView
 
     static class ClientViewHolder extends RecyclerView.ViewHolder {
         TextView tvClientName, tvClientMargin, tvClientPhone, tvClientDebtTag;
-        MaterialButton btnViewClientHistory, btnEditClient;
+        MaterialButton btnViewClientHistory, btnEditClient, btnDeleteClient;
 
         public ClientViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -114,6 +122,7 @@ public class ClientAdapter extends RecyclerView.Adapter<ClientAdapter.ClientView
             tvClientDebtTag = itemView.findViewById(R.id.tvClientDebtTag);
             btnViewClientHistory = itemView.findViewById(R.id.btnViewClientHistory);
             btnEditClient = itemView.findViewById(R.id.btnEditClient);
+            btnDeleteClient = itemView.findViewById(R.id.btnDeleteClient);
         }
     }
 }

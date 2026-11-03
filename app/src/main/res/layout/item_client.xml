@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginHorizontal="4dp"
     android:layout_marginBottom="8dp"
     app:cardCornerRadius="14dp"
     app:cardElevation="1dp"
@@ -97,6 +98,7 @@
                 style="@style/Widget.Material3.Button.TextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:minHeight="48dp"
                 android:text="Historial"
                 android:textSize="12sp"
                 app:icon="@drawable/ic_history" />
@@ -106,8 +108,21 @@
                 style="@style/Widget.Material3.Button.TextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:minHeight="48dp"
                 android:text="Editar"
                 android:textSize="12sp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnDeleteClient"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:text="@string/delete"
+                android:textColor="@color/accent_danger"
+                android:textSize="12sp"
+                app:icon="@drawable/ic_delete"
+                app:iconTint="@color/accent_danger" />
 
         </LinearLayout>
 
