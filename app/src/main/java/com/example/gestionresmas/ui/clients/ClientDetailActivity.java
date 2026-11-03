@@ -22,6 +22,7 @@ import com.example.gestionresmas.models.Client;
 import com.example.gestionresmas.models.Payment;
 import com.example.gestionresmas.models.Sale;
 import com.example.gestionresmas.models.SaleDetail;
+import com.example.gestionresmas.ui.UiUtils;
 import com.example.gestionresmas.ui.sales.NewSaleActivity;
 import com.example.gestionresmas.ui.sales.SalesAdapter;
 import com.google.android.material.appbar.MaterialToolbar;
@@ -90,13 +91,20 @@ public class ClientDetailActivity extends AppCompatActivity implements SalesAdap
         btnClientGeneralPayment.setOnClickListener(v -> showRegisterGeneralPaymentDialog());
         btnClientPaymentHistory.setOnClickListener(v -> showPaymentHistoryDialog());
 
-        rvClientSales.setLayoutManager(new LinearLayoutManager(this));
+        rvClientSales.setLayoutManager(UiUtils.createAdaptiveLayoutManager(this, 340));
+        UiUtils.setupEdgeToEdge(this, findViewById(R.id.rootClientDetail), findViewById(R.id.appBarLayout), rvClientSales, null);
         salesAdapter = new SalesAdapter(this);
         salesAdapter.setShowPayButton(true);
         salesAdapter.setListener(this);
         rvClientSales.setAdapter(salesAdapter);
 
         displayClientInfo();
+        loadClientSales();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         loadClientSales();
     }
 
