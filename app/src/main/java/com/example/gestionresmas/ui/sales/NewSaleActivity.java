@@ -1,6 +1,7 @@
 package com.example.gestionresmas.ui.sales;
 
 import android.app.DatePickerDialog;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -14,8 +15,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.gestionresmas.R;
@@ -26,6 +27,7 @@ import com.example.gestionresmas.models.BoxPurchase;
 import com.example.gestionresmas.models.Client;
 import com.example.gestionresmas.models.Sale;
 import com.example.gestionresmas.models.SaleDetail;
+import com.example.gestionresmas.ui.UiUtils;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -81,6 +83,11 @@ public class NewSaleActivity extends AppCompatActivity {
     private long editSaleId = -1;
     private boolean isEditing = false;
 
+    private boolean isRestoringState = false;
+    private int targetRestoredLotPos = -1;
+    private String restoredUnitPrice = null;
+    private String restoredMargin = null;
+
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
     private final NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.getDefault());
 
@@ -127,7 +134,7 @@ public class NewSaleActivity extends AppCompatActivity {
             btnConfirmSale.setText("Guardar Cambios de Venta");
         }
 
-        rvCartItems.setLayoutManager(new LinearLayoutManager(this));
+        rvCartItems.setLayoutManager(UiUtils.createAdaptiveLayoutManager(this, 340));
         cartAdapter = new SaleCartAdapter(this);
         cartAdapter.setListener((position, detail) -> {
             cartItems.remove(position);
@@ -135,6 +142,8 @@ public class NewSaleActivity extends AppCompatActivity {
             updateCartSummary();
         });
         rvCartItems.setAdapter(cartAdapter);
+
+        UiUtils.setupEdgeToEdge(this, findViewById(R.id.rootNewSale), findViewById(R.id.appBarLayout), findViewById(R.id.nestedScrollNewSale), null);
 
         // Fecha actual por defecto
         String today = dateFormat.format(new Date());
@@ -151,16 +160,132 @@ public class NewSaleActivity extends AppCompatActivity {
 
         setupPriceAndMarginListeners();
         setupClientsSpinner();
-        setupLotsSpinner();
 
         btnAddToCart.setOnClickListener(v -> addItemToCart());
         btnConfirmSale.setOnClickListener(v -> confirmSale());
 
-        if (isEditing) {
-            loadExistingSale();
-        }
+        if (savedInstanceState != null) {
+            if (isEditing) {
+                // Siempre cargar originalDetails para el cálculo de stock efectivo y lotes originales
+                List<SaleDetail> details = saleDao.getSaleDetails(editSaleId);
+                originalDetails.clear();
+                originalDetails.addAll(details);
+            }
 
-        updateCartSummary();
+            List<SaleDetail> savedCart;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                @SuppressWarnings("unchecked")
+                ArrayList<SaleDetail> list = (ArrayList<SaleDetail>) savedInstanceState.getSerializable("state_cart_items", ArrayList.class);
+                savedCart = list;
+            } else {
+                @SuppressWarnings("unchecked")
+                ArrayList<SaleDetail> list = (ArrayList<SaleDetail>) savedInstanceState.getSerializable("state_cart_items");
+                savedCart = list;
+            }
+
+            cartItems.clear();
+            if (savedCart != null) {
+                cartItems.addAll(savedCart);
+            }
+            cartAdapter.setItems(cartItems);
+            updateCartSummary();
+
+            int savedClientPos = savedInstanceState.getInt("state_client_pos", -1);
+            if (savedClientPos >= 0 && savedClientPos < clientsList.size()) {
+                spinnerClients.setSelection(savedClientPos);
+                selectedClient = clientsList.get(savedClientPos);
+            }
+
+            int savedLotPos = savedInstanceState.getInt("state_lot_pos", 0);
+            targetRestoredLotPos = savedLotPos;
+            isRestoringState = true;
+            restoredUnitPrice = savedInstanceState.getString("state_unit_price", "");
+            restoredMargin = savedInstanceState.getString("state_margin", "");
+
+            setupLotsSpinner();
+
+            if (savedLotPos >= 0 && savedLotPos < activeLotsList.size()) {
+                spinnerLots.setSelection(savedLotPos);
+                selectedLot = activeLotsList.get(savedLotPos);
+            }
+
+            String savedQuantity = savedInstanceState.getString("state_quantity", "1");
+            etQuantity.setText(savedQuantity);
+
+            String savedSaleDate = savedInstanceState.getString("state_sale_date", "");
+            if (savedSaleDate != null && !savedSaleDate.isEmpty()) {
+                etSaleDate.setText(savedSaleDate);
+                try {
+                    Date d = dateFormat.parse(savedSaleDate);
+                    if (d != null) {
+                        calendar.setTime(d);
+                    }
+                } catch (Exception ignored) {}
+            }
+
+            boolean savedIsPaid = savedInstanceState.getBoolean("state_is_paid", true);
+            if (savedIsPaid) {
+                rbPagado.setChecked(true);
+            } else {
+                rbDebe.setChecked(true);
+            }
+
+            isUpdatingPrice = true;
+            try {
+                if (restoredUnitPrice != null) {
+                    etUnitPrice.setText(restoredUnitPrice);
+                }
+                if (restoredMargin != null) {
+                    etMargin.setText(restoredMargin);
+                }
+
+                double unitPrice = 0.0;
+                try {
+                    if (restoredUnitPrice != null && !restoredUnitPrice.isEmpty()) {
+                        unitPrice = Double.parseDouble(restoredUnitPrice);
+                    }
+                } catch (NumberFormatException ignored) {}
+                currentDynamicUnitPrice = unitPrice;
+
+                if (selectedLot != null) {
+                    double unitCost = selectedLot.getPrecioCostoUnitario();
+                    double utility = SaleDetail.calcularUtilidadUnitaria(unitPrice, unitCost);
+                    double margin = 0.0;
+                    try {
+                        if (restoredMargin != null && !restoredMargin.isEmpty()) {
+                            margin = Double.parseDouble(restoredMargin);
+                        }
+                    } catch (NumberFormatException ignored) {}
+
+                    tvFormulaPreview.setText("Costo: " + currencyFormat.format(unitCost) +
+                            " | Utilidad: " + currencyFormat.format(utility) +
+                            " (" + String.format(Locale.getDefault(), "%.1f", margin) + "% margen)");
+                    tvDynamicUnitPrice.setText(currencyFormat.format(unitPrice));
+                }
+            } finally {
+                isUpdatingPrice = false;
+            }
+        } else {
+            if (isEditing) {
+                loadExistingSale();
+            } else {
+                setupLotsSpinner();
+                updateCartSummary();
+            }
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable("state_cart_items", new ArrayList<>(cartItems));
+        outState.putInt("state_client_pos", spinnerClients.getSelectedItemPosition());
+        outState.putInt("state_lot_pos", spinnerLots.getSelectedItemPosition());
+        outState.putString("state_unit_price", etUnitPrice.getText().toString());
+        outState.putString("state_margin", etMargin.getText().toString());
+        outState.putString("state_quantity", etQuantity.getText().toString());
+        outState.putString("state_sale_date", etSaleDate.getText().toString());
+        outState.putBoolean("state_is_paid", rbPagado.isChecked());
     }
 
     private void setupPriceAndMarginListeners() {
@@ -288,13 +413,58 @@ public class NewSaleActivity extends AppCompatActivity {
                 android.R.layout.simple_spinner_dropdown_item, activeLotsList);
         spinnerLots.setAdapter(lotsAdapter);
 
+        if (targetRestoredLotPos >= 0 && targetRestoredLotPos < activeLotsList.size()) {
+            spinnerLots.setSelection(targetRestoredLotPos);
+            selectedLot = activeLotsList.get(targetRestoredLotPos);
+        }
+
         spinnerLots.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 selectedLot = activeLotsList.get(position);
                 int stockEfectivo = getEffectiveAvailableStock(selectedLot);
                 tilQuantity.setHelperText("Stock disponible: " + stockEfectivo + " resmas");
-                recalculatePriceFromCurrentInputs();
+
+                if (isRestoringState) {
+                    if (position != targetRestoredLotPos && targetRestoredLotPos >= 0 && targetRestoredLotPos < activeLotsList.size()) {
+                        return;
+                    }
+                    isRestoringState = false;
+                    isUpdatingPrice = true;
+                    try {
+                        if (restoredUnitPrice != null) {
+                            etUnitPrice.setText(restoredUnitPrice);
+                        }
+                        if (restoredMargin != null) {
+                            etMargin.setText(restoredMargin);
+                        }
+                        double unitPrice = 0.0;
+                        try {
+                            if (restoredUnitPrice != null && !restoredUnitPrice.isEmpty()) {
+                                unitPrice = Double.parseDouble(restoredUnitPrice);
+                            }
+                        } catch (NumberFormatException ignored) {}
+                        currentDynamicUnitPrice = unitPrice;
+
+                        double unitCost = selectedLot.getPrecioCostoUnitario();
+                        double utility = SaleDetail.calcularUtilidadUnitaria(unitPrice, unitCost);
+                        double margin = 0.0;
+                        try {
+                            if (restoredMargin != null && !restoredMargin.isEmpty()) {
+                                margin = Double.parseDouble(restoredMargin);
+                            }
+                        } catch (NumberFormatException ignored) {}
+
+                        tvFormulaPreview.setText("Costo: " + currencyFormat.format(unitCost) +
+                                " | Utilidad: " + currencyFormat.format(utility) +
+                                " (" + String.format(Locale.getDefault(), "%.1f", margin) + "% margen)");
+                        tvDynamicUnitPrice.setText(currencyFormat.format(unitPrice));
+                    } finally {
+                        isUpdatingPrice = false;
+                    }
+                } else {
+                    recalculatePriceFromCurrentInputs();
+                }
             }
 
             @Override
