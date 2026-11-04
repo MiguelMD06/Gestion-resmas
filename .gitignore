@@ -16,7 +16,6 @@
 .cxx
 local.properties
 
-planificacion/
 CLAUDE.md
 CLAUDE.local.md
 GEMINI.md
@@ -24,4 +23,3 @@ GEMINI.md
 .env
 .env.*
 !.env.example
-
